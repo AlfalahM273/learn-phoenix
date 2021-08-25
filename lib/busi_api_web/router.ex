@@ -9,13 +9,19 @@ defmodule BusiApiWeb.Router do
     plug BusiApiWeb.Auth.Pipeline
   end
 
-  scope "/api", BusiApiWeb do
+  scope "/api/graphiql" do
+    pipe_through [:api]
+    forward("/", Absinthe.Plug, schema: BusiApiWeb.Schema)
+    forward("/graphiql", Absinthe.Plug.GraphiQL, schema: BusiApiWeb.Schema)
+  end
+
+  scope "/api/v1", BusiApiWeb do
     pipe_through :api
     post "/users/signup", UserController, :create
     post "/users/signin", UserController, :signin
   end
 
-  scope "/api", BusiApiWeb do
+  scope "/api/v1", BusiApiWeb do
     pipe_through [:api, :auth]
     resources "/businesses", BusinessController, except: [:new, :edit]
   end
